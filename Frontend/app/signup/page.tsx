@@ -1,0 +1,103 @@
+"use client"
+
+import type React from "react"
+
+import { useState } from "react"
+import Link from "next/link"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Mail } from "lucide-react"
+
+export default function SignupPage() {
+  const [email, setEmail] = useState("")
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    console.log("Signup attempt with:", { email })
+  }
+
+  return (
+    <main className="min-h-screen flex flex-col space-bg">
+      <Link href="/" className="p-6 flex items-center gap-2">
+        <div className="w-8 h-8 bg-purple-600 rounded-full"></div>
+        <span className="font-bold tracking-wider">AI CONTENT</span>
+      </Link>
+
+      <div className="flex-1 flex flex-col md:flex-row">
+        <div className="flex-1 flex items-center justify-center p-8">
+          <div className="max-w-md w-full">
+            <h1 className="text-5xl font-bold mb-2">SIGN UP TO YOUR</h1>
+            <h2 className="text-5xl font-bold text-purple-400 mb-12">ADVENTURE!</h2>
+          </div>
+        </div>
+
+        <div className="flex-1 flex items-center justify-center p-8">
+          <div className="max-w-md w-full">
+            <h1 className="text-5xl font-bold mb-2">SIGN UP</h1>
+            <p className="text-gray-300 mb-8">Sign in with email address</p>
+
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div className="relative">
+                <Mail className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+                <Input
+                  type="email"
+                  placeholder="Yourname@gmail.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="pl-10 py-6 bg-purple-900/30 border-purple-700 text-white rounded-full"
+                />
+              </div>
+
+              <Button
+                type="submit"
+                className="w-full py-6 bg-gradient-to-r from-purple-600 to-blue-500 hover:from-purple-700 hover:to-blue-600 rounded-full"
+              >
+                Sign up
+              </Button>
+            </form>
+
+            <div className="mt-8">
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-gray-700"></div>
+                </div>
+                <div className="relative flex justify-center text-sm">
+                  <span className="px-2 bg-[#13111C] text-gray-400">Or continue with</span>
+                </div>
+              </div>
+
+              <div className="mt-6 grid grid-cols-2 gap-4">
+                <Button variant="outline" className="py-5 border-purple-700 hover:bg-purple-900/50 rounded-full">
+                  <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
+                    <path
+                      fill="currentColor"
+                      d="M12.545,10.239v3.821h5.445c-0.712,2.315-2.647,3.972-5.445,3.972c-3.332,0-6.033-2.701-6.033-6.032s2.701-6.032,6.033-6.032c1.498,0,2.866,0.549,3.921,1.453l2.814-2.814C17.503,2.988,15.139,2,12.545,2C7.021,2,2.543,6.477,2.543,12s4.478,10,10.002,10c8.396,0,10.249-7.85,9.426-11.748L12.545,10.239z"
+                    />
+                  </svg>
+                  Google
+                </Button>
+                <Button variant="outline" className="py-5 border-purple-700 hover:bg-purple-900/50 rounded-full">
+                  <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
+                    <path
+                      fill="currentColor"
+                      d="M9.101,23.691v-7.98H6.627v-3.667h2.474v-1.58c0-4.085,1.848-5.978,5.858-5.978c0.401,0,0.955,0.042,1.569,0.103v3.149h-1.106c-1.269,0-1.937,0.755-1.937,2.188v2.118h3.587l-0.502,3.667h-3.085v7.98H9.101z"
+                    />
+                  </svg>
+                  Facebook
+                </Button>
+              </div>
+            </div>
+
+            <p className="mt-6 text-center text-sm text-gray-400">
+              By registering you with our{" "}
+              <Link href="#" className="text-purple-400 hover:underline">
+                Terms and Conditions
+              </Link>
+            </p>
+          </div>
+        </div>
+      </div>
+    </main>
+  )
+}
+
