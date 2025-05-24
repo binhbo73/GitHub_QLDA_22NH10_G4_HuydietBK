@@ -2,3 +2,5 @@ django
 djangorestframework
 mongoengine
 python-dotenv
+google-auth
+google-auth-oauthlib
