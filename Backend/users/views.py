@@ -26,14 +26,12 @@ class UserAPIView(APIView):
     
 class GoogleLoginAPIView(APIView):
     def post(self, request):
-        print("Google login request received")
         token = request.data.get('token')
         if not token:
             return Response({"error": "Token is required"}, status=status.HTTP_400_BAD_REQUEST)
         try:
             idinfo = id_token.verify_oauth2_token(token, google_requests.Request(), GOOGLE_CLIENT_ID)
             email = idinfo['email']
-            print(email)
             name = idinfo.get('name', '')
             provider_id = idinfo['sub']
             avatar_url = idinfo.get('picture', '')
