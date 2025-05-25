@@ -5,3 +5,5 @@ mongoengine
 python-dotenv
 google-auth
 google-auth-oauthlib
+openai==0.28
+httpx
