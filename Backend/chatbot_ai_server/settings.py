@@ -87,14 +87,15 @@ DATABASES = {
 }
 
 from mongoengine import connect
-connect(
-    db=os.getenv('MONGO_DB_NAME', 'chatbot_ai_db'),
-    username=os.getenv('MONGO_USER'),
-    password=os.getenv('MONGO_PASSWORD'),
-    host=os.getenv('MONGO_HOST', 'localhost'),
-    port=int(os.getenv('MONGO_PORT', 27017)),
-    authentication_source=os.getenv('MONGO_AUTH_SOURCE'),
-)
+# connect(
+#     db=os.getenv('MONGO_DB_NAME', 'chatbot_ai_db'),
+#     username=os.getenv('MONGO_USER'),
+#     password=os.getenv('MONGO_PASSWORD'),
+#     host=os.getenv('MONGO_HOST', 'localhost'),
+#     port=int(os.getenv('MONGO_PORT', 27017)),
+#     authentication_source=os.getenv('MONGO_AUTH_SOURCE'),
+# )
+connect(host=os.getenv('MONGO_URL'))
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
