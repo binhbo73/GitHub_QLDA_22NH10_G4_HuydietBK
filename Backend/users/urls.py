@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import UserAPIView, GoogleLoginAPIView
+from .views import UserAPIView, GoogleLoginAPIView, FirebaseLoginAPIView
 
 urlpatterns = [
     path('users/', view=UserAPIView.as_view()),
