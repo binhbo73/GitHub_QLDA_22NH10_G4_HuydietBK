@@ -8,13 +8,7 @@ import { ChatMessage } from '@/components/chat-message';
 import { MessageSquare, BarChart, FileText, Megaphone } from 'lucide-react';
 import { notFound } from 'next/navigation';
 import { use } from 'react';
-
-interface Message {
-  id: string;
-  text: string;
-  isBot: boolean;
-  timestamp: string;
-}
+import { Message } from '@/models/Message';
 
 interface ChatbotPageProps {
   params: Promise<{ type: string }>;
