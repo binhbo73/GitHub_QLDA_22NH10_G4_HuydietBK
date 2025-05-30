@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from .models import ChatSession, QA
+from datetime import datetime
 
 class QASerializer(serializers.Serializer):
     question = serializers.CharField()

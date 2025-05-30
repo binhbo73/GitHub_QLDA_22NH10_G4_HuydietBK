@@ -35,7 +35,9 @@ class GoogleLoginAPIView(APIView):
             name = idinfo.get('name', '')
             provider_id = idinfo['sub']
             avatar_url = idinfo.get('picture', '')
+            print(f"Finding user with email: {email}")
             user = User.objects(email=email).first()
+            print(f"User found: {user}")
             if not user:
                 user = User(
                     email=email,
