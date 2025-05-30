@@ -14,9 +14,16 @@
 
 import httpx
 import json
+from pathlib import Path
+import os
+from dotenv import load_dotenv
+
+# Build paths inside the project like this: BASE_DIR / 'subdir'.
+BASE_DIR = Path(__file__).resolve().parent.parent
+load_dotenv(BASE_DIR / '.env')
 
 headers = {
-  "Authorization": "Bearer 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",  # thay bằng key của bạn
+  "Authorization": "Bearer " + os.getenv('OPENROUTER_API_KEY'),
   "Content-Type": "application/json"
 }
 
