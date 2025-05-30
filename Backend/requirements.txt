@@ -7,7 +7,12 @@ google-auth
 google-auth-oauthlib
 openai==0.28
 httpx
-openai-whisper
-pydub
+numpy
+wheel
+ffmpeg-python
+SoundFile
+librosa
+sounddevice
+torch
 torchvision
 transformers
