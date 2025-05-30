@@ -3,6 +3,7 @@ from .models import ChatSession, QA
 from datetime import datetime
 
 class QASerializer(serializers.Serializer):
+    id = serializers.UUIDField(read_only=True)
     question = serializers.CharField()
     answer = serializers.CharField()
     created_at = serializers.DateTimeField(read_only=True)
