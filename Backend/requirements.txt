@@ -11,3 +11,5 @@ openai-whisper
 pydub
 torchvision
 transformers
+channels
+daphne
