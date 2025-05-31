@@ -5,6 +5,8 @@ from .serializers import QASerializer, ChatSessionSerializer
 from .models import ChatSession, QA
 from users.models import User
 from datetime import datetime
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
 
 from uuid import UUID
 
@@ -78,3 +80,13 @@ class QAView(APIView):
                 return Response({"message": "Answer updated successfully"}, status=status.HTTP_200_OK)
 
         return Response({"error": "QA not found in this chat session"}, status=status.HTTP_404_NOT_FOUND)
+    
+def send_message_to_user(user_id, message):
+    channel_layer = get_channel_layer()
+    async_to_sync(channel_layer.group_send)(
+        f"user_{user_id}",
+        {
+            "type": "send_notification",
+            "message": message
+        }
+    )

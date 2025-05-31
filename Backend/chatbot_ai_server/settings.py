@@ -29,10 +29,12 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+ASGI_APPLICATION = 'chatbot_ai_server.asgi.application'
 
 # Application definition
 
 INSTALLED_APPS = [
+    'daphne',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -42,7 +44,10 @@ INSTALLED_APPS = [
 
     'rest_framework',
     'corsheaders',
-    'users'
+    'users',
+    'channels',
+    'chatbot',
+    'chatbot_ai_server',  # Ensure your main app is included
 ]
 
 MIDDLEWARE = [
@@ -57,6 +62,12 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'chatbot_ai_server.urls'
+
+CHANNEL_LAYERS = {
+  "default": {
+    "BACKEND": "channels.layers.InMemoryChannelLayer"
+  }
+}
 
 TEMPLATES = [
     {

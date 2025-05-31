@@ -27,6 +27,8 @@
         if (res.ok) {
           // Save JWT or session info
           localStorage.setItem('jwt', data.token);
+          localStorage.setItem('user_id', data.user.id); // giả sử backend trả về "user": {"id": "..."}
+          window.location.href = "chat.html";
           console.log('User:', data.user);
         } else {
           console.error('Login failed', data);
