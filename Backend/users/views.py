@@ -39,6 +39,9 @@ class LoginAPIView(APIView):
         user = User.objects(email=email).first()
         if user:
             serializer = UserSerializer(user)
+            if not check_password(password, user.password):
+                print("Password is incorrect")
+                return Response({'error': 'Invalid email or password'}, status=status.HTTP_401_UNAUTHORIZED)
             return Response({'user': serializer.data}, status=status.HTTP_200_OK)
         return Response({'error': 'Invalid email or password'}, status=status.HTTP_401_UNAUTHORIZED)
     
