@@ -17,6 +17,7 @@ export default function LoginPage() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     console.log('Login attempt with:', { email, password });
+    localStorage.setItem('username', email);
     router.push('/chatbot/general');
   };
 

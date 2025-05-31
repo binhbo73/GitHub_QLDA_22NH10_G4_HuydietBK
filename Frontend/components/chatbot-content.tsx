@@ -122,7 +122,10 @@ export function ChatbotContent({ type }: ChatbotContentProps) {
         <p className='text-gray-300 max-w-2xl text-sm'>{data.description}</p>
       </div> */}
 
-      <div ref={chatContainerRef} className='flex-1 overflow-y-auto px-6 py-4'>
+      <div
+        ref={chatContainerRef}
+        className='flex-1 overflow-y-auto custom-scrollbar'
+      >
         {messages.length === 0 ? (
           <div className='h-full flex items-center justify-center'>
             <p className='text-center text-gray-400'>
