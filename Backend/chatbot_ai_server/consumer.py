@@ -3,13 +3,13 @@ import json
 
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
-        # self.user_id = self.scope['url_route']['kwargs']['user_id']  # Lấy user_id từ URL
-        # self.group_name = f"user_{self.user_id}"
+        self.user_id = self.scope['url_route']['kwargs']['user_id']  # Lấy user_id từ URL
+        self.group_name = f"user_{self.user_id}"
 
-        # await self.channel_layer.group_add(
-        #     self.group_name,
-        #     self.channel_name
-        # )
+        await self.channel_layer.group_add(
+            self.group_name,
+            self.channel_name
+        )
 
         await self.accept()
 
