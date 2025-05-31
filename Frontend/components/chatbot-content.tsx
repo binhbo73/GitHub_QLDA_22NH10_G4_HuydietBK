@@ -1,10 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { MessageInput } from '@/components/message-input';
 import { ChatMessage } from '@/components/chat-message';
 import { MessageSquare, BarChart, FileText, Megaphone } from 'lucide-react';
-import { Message } from '@/models/Message';
+import type { Message } from '@/models/Message';
 
 interface ChatbotContentProps {
   type: string;
@@ -46,7 +46,19 @@ export function ChatbotContent({ type }: ChatbotContentProps) {
     }
     return [];
   });
+
+  // Ref for auto-scrolling
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const chatContainerRef = useRef<HTMLDivElement>(null);
+
   const data = chatbotData[type as keyof typeof chatbotData];
+
+  // Auto-scroll to bottom when messages change
+  useEffect(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [messages]);
 
   const handleSendMessage = async (message: string) => {
     const chatId = new URLSearchParams(window.location.search).get('chat');
@@ -90,26 +102,35 @@ export function ChatbotContent({ type }: ChatbotContentProps) {
         isBot: true,
         timestamp: new Date().toLocaleTimeString()
       };
-      setMessages(prev => [...prev, botMessage]);
+      setMessages(prev => {
+        const newMessages = [...prev, botMessage];
+        // Save updated messages with bot response
+        if (chatId) {
+          localStorage.setItem(`chat_${chatId}`, JSON.stringify(newMessages));
+        }
+        return newMessages;
+      });
     }, 1000);
   };
 
   return (
-    <section className='flex-1 flex flex-col items-center px-6 py-12 max-w-4xl mx-auto w-full'>
-      <div className='flex flex-col items-center text-center mb-12'>
-        <div className='bg-purple-600 p-4 rounded-full mb-6'>{data.icon}</div>
-        <h1 className='text-3xl font-bold mb-4'>{data.title}</h1>
-        <p className='text-gray-300 max-w-2xl'>{data.description}</p>
-      </div>
+    <div className='flex-1 flex flex-col h-full'>
+      {/* Header section - fixed */}
+      {/* <div className='flex flex-col items-center text-center py-8 px-6 border-b border-purple-900/30'>
+        <div className='bg-purple-600 p-4 rounded-full mb-4'>{data.icon}</div>
+        <h1 className='text-2xl font-bold mb-2'>{data.title}</h1>
+        <p className='text-gray-300 max-w-2xl text-sm'>{data.description}</p>
+      </div> */}
 
-      <div className='w-full flex-1 flex flex-col overflow-y-auto px-4'>
+      <div ref={chatContainerRef} className='flex-1 overflow-y-auto px-6 py-4'>
         {messages.length === 0 ? (
-          <div className='text-center text-gray-400 flex-1 flex items-center justify-center'>
-            <p>Start a conversation with the AI assistant</p>
+          <div className='h-full flex items-center justify-center'>
+            <p className='text-center text-gray-400'>
+              Start a conversation with the AI assistant
+            </p>
           </div>
         ) : (
-          <div className='space-y-4'>
-            {' '}
+          <div className='space-y-4 max-w-4xl mx-auto'>
             {messages.map(msg => (
               <ChatMessage
                 key={msg.id}
@@ -129,13 +150,16 @@ export function ChatbotContent({ type }: ChatbotContentProps) {
                 }
               />
             ))}
+            <div ref={messagesEndRef} />
           </div>
         )}
       </div>
 
-      <div className='w-full mt-8'>
-        <MessageInput onSendMessage={handleSendMessage} />
+      <div className='border-t border-purple-900/30 p-4'>
+        <div className='max-w-4xl mx-auto'>
+          <MessageInput onSendMessage={handleSendMessage} />
+        </div>
       </div>
-    </section>
+    </div>
   );
 }

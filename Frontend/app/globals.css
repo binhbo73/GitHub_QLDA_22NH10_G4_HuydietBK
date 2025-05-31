@@ -53,8 +53,91 @@ body {
 }
 
 .space-bg {
-  background-image: url("/space-bg.png");
+  background-image: url('/space-bg.png');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
+}
+
+/* Custom Scrollbar Styles - Sử dụng màu từ CSS variables của bạn */
+@layer components {
+  .custom-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: hsla(268, 8%, 65%, 0.8) transparent;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: hsla(270, 50%, 5%, 0.3);
+    border-radius: 4px;
+    margin: 4px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: linear-gradient(
+      180deg,
+      hsl(267 100% 70% / 0.6),
+      hsl(267 100% 60% / 0.8)
+    );
+    border-radius: 4px;
+    border: 1px solid hsl(267 100% 70% / 0.2);
+    transition: all 0.2s ease;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(
+      180deg,
+      hsl(267 100% 70% / 0.8),
+      hsl(267 100% 60% / 1)
+    );
+    border-color: hsl(267 100% 70% / 0.4);
+    box-shadow: 0 0 8px hsl(267 100% 70% / 0.3);
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb:active {
+    background: linear-gradient(
+      180deg,
+      hsl(267 100% 60% / 0.9),
+      hsl(267 100% 50% / 1)
+    );
+    box-shadow: 0 0 12px hsl(267 100% 70% / 0.5);
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-corner {
+    background: transparent;
+  }
+
+  /* Scrollbar cho sidebar - style nhẹ hơn */
+  .sidebar-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: hsla(268, 8%, 65%, 0.8) transparent;
+  }
+
+  .sidebar-scrollbar::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .sidebar-scrollbar::-webkit-scrollbar-track {
+    background: hsl(270 50% 5% / 0.2);
+    border-radius: 3px;
+    margin: 2px;
+  }
+
+  .sidebar-scrollbar::-webkit-scrollbar-thumb {
+    background: hsla(268, 8%, 65%, 0.8);
+    border-radius: 3px;
+    transition: all 0.2s ease;
+  }
+
+  .sidebar-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: hsla(268, 8%, 65%, 0.8);
+    box-shadow: 0 0 6px hsla(268, 8%, 65%, 0.8);
+  }
+
+  .sidebar-scrollbar::-webkit-scrollbar-thumb:active {
+    background: hsla(268, 8%, 65%, 0.8);
+  }
 }
