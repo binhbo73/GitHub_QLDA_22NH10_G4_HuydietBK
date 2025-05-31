@@ -8,17 +8,31 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Mail, Lock } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import handleLogin from '@/lib/login';
+import Notification from '@/components/notification';
 
 export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [loginSuccess, setLoginSuccess] = useState(false);
+  const [loginError, setLoginError] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Login attempt with:', { email, password });
-    localStorage.setItem('username', email);
-    router.push('/chatbot/general');
+    try {
+      const loginData = await handleLogin(email, password);
+      if (loginData.user?.id) {
+        localStorage.setItem('userId', loginData.user.id.toString());
+        setLoginSuccess(true);
+        setTimeout(() => {
+          router.push('/chatbot/general');
+        }, 2000);
+      }
+    } catch (error: any) {
+      console.error('Login error:', error.message);
+      setLoginError(true);
+    }
   };
 
   return (
@@ -125,6 +139,24 @@ export default function LoginPage() {
           </div>
         </div>
       </div>
+
+      {loginSuccess && (
+        <Notification
+          message='Login successful! Redirecting...'
+          type='success'
+          onClose={() => setLoginSuccess(false)}
+          duration={4000}
+        />
+      )}
+
+      {loginError && (
+        <Notification
+          message='Incorrect or missing email or password.'
+          type='error'
+          onClose={() => setLoginError(false)}
+          duration={4000}
+        />
+      )}
     </main>
   );
 }

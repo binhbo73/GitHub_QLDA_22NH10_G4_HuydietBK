@@ -3,6 +3,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from google.oauth2 import id_token
 from google.auth.transport import requests as google_requests
+from django.contrib.auth.hashers import check_password
 from .models import User
 from .serializers import UserSerializer
 from datetime import datetime
@@ -23,6 +24,23 @@ class UserAPIView(APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class LoginAPIView(APIView):
+    def post(self, request, format=None):
+        email = request.data.get('email')
+        password = request.data.get('password')
+        print(f"Login with email: {email}")
+        print(f"Login with password: {password}")
+
+        if not all ([email, password]):
+            print("Email or password is missing")
+            return Response({'error': 'Email and password are required'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        user = User.objects(email=email).first()
+        if user:
+            serializer = UserSerializer(user)
+            return Response({'user': serializer.data}, status=status.HTTP_200_OK)
+        return Response({'error': 'Invalid email or password'}, status=status.HTTP_401_UNAUTHORIZED)
     
 class GoogleLoginAPIView(APIView):
     def post(self, request):

@@ -8,7 +8,7 @@ import { useEffect, useState } from 'react';
 
 export function Navbar() {
   const pathname = usePathname();
-  const username = localStorage.getItem('username') || null;
+  const userId = localStorage.getItem('userId') || null;
 
   return (
     <header className='w-full py-4 px-6 flex items-center justify-between border-b border-purple-900'>
@@ -28,7 +28,7 @@ export function Navbar() {
       </div>
 
       <nav className='hidden md:flex items-center gap-8'>
-        {username ? (
+        {userId ? (
           <>
             <Link
               href='/chatbot/general'
@@ -108,9 +108,9 @@ export function Navbar() {
       </nav>
 
       <div className='flex items-center gap-4'>
-        {username ? (
+        {userId ? (
           <Button
-            onClick={() => localStorage.removeItem('username')}
+            onClick={() => localStorage.removeItem('userId')}
             variant='outline'
             className='rounded-full border-purple-600 text-white hover:bg-purple-900'
           >
