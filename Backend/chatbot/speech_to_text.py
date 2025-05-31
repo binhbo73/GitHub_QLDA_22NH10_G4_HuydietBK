@@ -13,7 +13,7 @@ def transfer_audio_to_text():
   media_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "media")
   os.makedirs(media_dir, exist_ok=True)
     
-  filename = os.path.join(media_dir, "audio.wav")
+  filename = os.path.join(media_dir, "output.wav")
   processed_filename = os.path.join(media_dir, "processed_audio.wav")
 
   # Tiền xử lý âm thanh
@@ -26,4 +26,8 @@ def transfer_audio_to_text():
   transcriber = pipeline("automatic-speech-recognition", model="vinai/PhoWhisper-base")
   output = transcriber(processed_filename)['text']
   
+  print(output)
+  
   return output
+
+transfer_audio_to_text()

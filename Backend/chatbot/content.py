@@ -49,5 +49,4 @@ def generate_content(model, prompt):
         except Exception as e:
           pass  # hoặc in lỗi ra để debug
 
-response = generate_content("deepseek/deepseek-r1:free", "Viết một đoạn văn 300 từ giới thiệu về bộ phim Doraemon.")
-print(response)
+generate_content("deepseek/deepseek-r1:free", "Viết một đoạn văn 100 từ giới thiệu về bộ phim Doraemon.")
