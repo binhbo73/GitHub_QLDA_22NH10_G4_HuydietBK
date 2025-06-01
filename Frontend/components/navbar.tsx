@@ -4,11 +4,16 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
-import { useEffect, useState } from 'react';
+import { handleLogout } from '@/lib/login';
 
 export function Navbar() {
   const pathname = usePathname();
   const userId = localStorage.getItem('userId') || null;
+
+  const handleLogoutClick = () => {
+    handleLogout();
+    window.location.href = '/';
+  };
 
   return (
     <header className='w-full py-4 px-6 flex items-center justify-between border-b border-purple-900'>
@@ -110,7 +115,7 @@ export function Navbar() {
       <div className='flex items-center gap-4'>
         {userId ? (
           <Button
-            onClick={() => localStorage.removeItem('userId')}
+            onClick={handleLogoutClick}
             variant='outline'
             className='rounded-full border-purple-600 text-white hover:bg-purple-900'
           >
