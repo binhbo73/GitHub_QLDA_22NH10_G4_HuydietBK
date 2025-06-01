@@ -21,6 +21,18 @@ class UserAPIView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request, format=None):
+        email = request.data.get('email')
+        password = request.data.get('password')
+        name = request.data.get('name')
+
+        if not email or not password or not name: 
+            return Response({'error': 'Email, password and name are required!'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        user = User.objects(email=email).first()
+
+        if user:
+            return Response ({'error': 'This email has been used before!'}, status=status.HTTP_400_BAD_REQUEST)
+        
         serializer = UserSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -31,8 +43,6 @@ class LoginAPIView(APIView):
     def post(self, request, format=None):
         email = request.data.get('email')
         password = request.data.get('password')
-        print(f"Login with email: {email}")
-        print(f"Login with password: {password}")
 
         if not all ([email, password]):
             print("Email or password is missing")

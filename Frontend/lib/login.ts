@@ -42,6 +42,26 @@ export async function handleLoginWithGoogle(credentialResponse: any) {
   }
 }
 
+export async function handleSignup(
+  email: string,
+  name: string,
+  password: string
+) {
+  const response = await fetch(`${API_BASE_URL}users/`, {
+    method: 'POST',
+    headers: {
+      'Content-type': 'application/json'
+    },
+    body: JSON.stringify({ email, name, password })
+  });
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data.error || 'Signup failed');
+  }
+  localStorage.setItem('userId', data.id.toString());
+  return data;
+}
+
 export async function handleLogout() {
   localStorage.removeItem('userId');
 }

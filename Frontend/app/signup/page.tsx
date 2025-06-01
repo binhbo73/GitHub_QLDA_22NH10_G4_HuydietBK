@@ -12,16 +12,34 @@ import GoogleLoginButton from '@/hooks/use-google';
 import { GOOGLE_CLIENT_ID } from '@/lib/config';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { useRouter } from 'next/navigation';
+import { handleSignup } from '@/lib/login';
+import Notification from '@/components/notification';
 
 export default function SignupPage() {
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [name, setName] = useState('');
   const [password, setPassword] = useState('');
+  const [signupSuccess, setSignupSuccess] = useState(false);
+  const [signupError, setSignupError] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Signup attempt with:', { email, name, password });
+    try {
+      const signupData = await handleSignup(email, name, password);
+      console.log('Signup data:', signupData);
+      if (signupData.id) {
+        setSignupSuccess(true);
+        setToastMessage('Signup successful!');
+        setTimeout(() => {
+          router.push('/chatbot/general');
+        }, 2000);
+      }
+    } catch (error: any) {
+      setSignupError(true);
+      setToastMessage(error.message || 'Signup failed');
+    }
   };
 
   return (
@@ -133,6 +151,24 @@ export default function SignupPage() {
             </div>
           </div>
         </div>
+
+        {signupSuccess && (
+          <Notification
+            message={toastMessage}
+            type='success'
+            onClose={() => setSignupSuccess(false)}
+            duration={4000}
+          />
+        )}
+
+        {signupError && (
+          <Notification
+            message={toastMessage}
+            type='error'
+            onClose={() => setSignupError(false)}
+            duration={4000}
+          />
+        )}
       </main>
     </GoogleOAuthProvider>
   );
