@@ -116,7 +116,7 @@ export default function LoginPage() {
                 </div>
 
                 <div className='mt-6 grid grid-cols-2 gap-4'>
-                  <GoogleLoginButton />
+                  <GoogleLoginButton type='login' />
                   <Button
                     variant='outline'
                     className='py-5 border-purple-700 hover:bg-purple-900/50 rounded-full'

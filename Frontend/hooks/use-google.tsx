@@ -7,7 +7,11 @@ import Notification from '@/components/notification';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
-export default function GoogleLoginButton() {
+export default function GoogleLoginButton({
+  type
+}: {
+  type: 'login' | 'signup';
+}) {
   const router = useRouter();
   const [loginSuccess, setLoginSuccess] = useState(false);
   const [loginError, setLoginError] = useState(false);
@@ -20,18 +24,18 @@ export default function GoogleLoginButton() {
         if (loginData.user?.id) {
           console.log('User ID:', loginData.user.id);
           setLoginSuccess(true);
-          setToastMessage('Google login successful!');
+          setToastMessage(`Google ${type} successful!`);
           setTimeout(() => {
             router.push('/chatbot/general');
           }, 2000);
         }
       } catch (error: any) {
         setLoginError(true);
-        setToastMessage(error.message + '.' || 'Login failed');
+        setToastMessage(error.message + '.' || 'Google ' + type + ' failed');
       }
     },
     onError: () => {
-      console.error('Login Failed');
+      console.error(`Google ${type} failed`);
     },
     flow: 'implicit'
   });
