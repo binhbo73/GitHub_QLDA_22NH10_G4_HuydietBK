@@ -1,11 +1,12 @@
 from rest_framework import serializers
+# from rest_framework_mongoengine import serializers
 from .models import ChatSession, QA
 from datetime import datetime
 
 class QASerializer(serializers.Serializer):
     id = serializers.UUIDField(read_only=True)
     question = serializers.CharField()
-    answer = serializers.CharField()
+    answer = serializers.CharField(allow_null=True, required=False)
     created_at = serializers.DateTimeField(read_only=True)
     updated_at = serializers.DateTimeField(read_only=True)
 
@@ -31,3 +32,7 @@ class ChatSessionSerializer(serializers.ModelSerializer):
         instance.updated_at = datetime.utcnow()
         instance.save()
         return instance
+    
+    class Meta:
+        model = ChatSession
+        fields = "__all__"

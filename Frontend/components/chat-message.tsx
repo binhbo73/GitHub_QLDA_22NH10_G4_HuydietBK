@@ -3,6 +3,9 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Pencil, Check, Share2 } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
+import React from 'react';
+import { handleSaveEditedMessage } from '@/lib/qa';
 
 interface ChatMessageProps {
   message: string;
@@ -24,6 +27,7 @@ export function ChatMessage({
     if (onEdit) {
       onEdit(editedMessage);
     }
+
     setIsEditing(false);
   };
 
@@ -53,7 +57,8 @@ export function ChatMessage({
               />
             </div>
           ) : (
-            <p className='text-sm whitespace-pre-wrap break-words'>{message}</p>
+            // <p className='text-sm whitespace-pre-wrap break-words'>{message}</p>
+            <ReactMarkdown>{message}</ReactMarkdown>
           )}
         </div>
         {timestamp && <p className='text-xs text-gray-400 mt-1'>{timestamp}</p>}

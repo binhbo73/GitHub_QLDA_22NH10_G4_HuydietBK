@@ -25,26 +25,34 @@ export function ChatSidebar({ onNewChat }: { onNewChat?: () => void }) {
 
   const createNewChat = () => {
     // Generate a new chat ID
-    const newChatId = Date.now().toString();
-    const newChat: ChatHistory = {
-      id: newChatId,
-      title: 'New Chat',
-      type: currentType,
-      timestamp: new Date().toLocaleDateString()
-    };
+    const chatSessionID = localStorage.getItem('chatSessionId');
+    alert(chatSessionID);
+    const haveFirstMessageInThisChatSession = localStorage.getItem(
+      'haveFirstMessageInThisChatSession'
+    );
+    if (haveFirstMessageInThisChatSession) {
+      const newChatId = Date.now().toString();
+      const newChat: ChatHistory = {
+        id: newChatId,
+        title: 'New Chat',
+        type: currentType,
+        timestamp: new Date().toLocaleDateString()
+      };
 
-    // Update chat history
-    const updatedHistory = [newChat, ...chatHistory];
-    setChatHistory(updatedHistory);
-    localStorage.setItem('chatHistory', JSON.stringify(updatedHistory));
+      // Update chat history
+      const updatedHistory = [newChat, ...chatHistory];
+      setChatHistory(updatedHistory);
+      localStorage.setItem('chatHistory', JSON.stringify(updatedHistory));
 
-    // Trigger new chat callback
-    if (onNewChat) {
-      onNewChat();
+      // Trigger new chat callback
+      if (onNewChat) {
+        onNewChat();
+      }
+
+      // Navigate to a new chat URL
+      window.location.href = `/chatbot/${currentType}?chat=${newChatId}`;
+      localStorage.removeItem('chatSessionId');
     }
-
-    // Navigate to a new chat URL
-    window.location.href = `/chatbot/${currentType}?chat=${newChatId}`;
   };
 
   const deleteChat = (id: string) => {
