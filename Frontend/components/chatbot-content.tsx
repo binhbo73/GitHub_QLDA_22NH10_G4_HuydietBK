@@ -5,6 +5,7 @@ import { MessageInput } from '@/components/message-input';
 import { ChatMessage } from '@/components/chat-message';
 import { MessageSquare, BarChart, FileText, Megaphone } from 'lucide-react';
 import type { Message } from '@/models/Message';
+import { handleQA } from '@/lib/qa';
 
 interface ChatbotContentProps {
   type: string;
@@ -95,15 +96,22 @@ export function ChatbotContent({ type }: ChatbotContentProps) {
       }
     }
 
-    setTimeout(() => {
+    setTimeout(async () => {
       const botMessage: Message = {
         id: (Date.now() + 1).toString(),
         text: `This is a sample response from the ${data.title}. In a real application, this would be connected to an AI API.`,
         isBot: true,
         timestamp: new Date().toLocaleTimeString()
       };
+      const botAnswer = await handleQA(message);
+      const botResponse: Message = {
+        id: (Date.now() + 2).toString(),
+        text: botAnswer,
+        isBot: true,
+        timestamp: new Date().toLocaleTimeString()
+      };
       setMessages(prev => {
-        const newMessages = [...prev, botMessage];
+        const newMessages = [...prev, botResponse];
         // Save updated messages with bot response
         if (chatId) {
           localStorage.setItem(`chat_${chatId}`, JSON.stringify(newMessages));
