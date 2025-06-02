@@ -1,5 +1,4 @@
 from rest_framework import serializers
-# from rest_framework_mongoengine import serializers
 from .models import ChatSession, QA
 from datetime import datetime
 
@@ -10,10 +9,14 @@ class QASerializer(serializers.Serializer):
     created_at = serializers.DateTimeField(read_only=True)
     updated_at = serializers.DateTimeField(read_only=True)
 
-class ChatSessionSerializer(serializers.ModelSerializer):
+class ChatSessionSerializer(serializers.Serializer):
     id = serializers.UUIDField(read_only=True)
     user_id = serializers.UUIDField()
-    qa_pairs = QASerializer(many=True)
+    qa_pairs = serializers.ListField(
+        child=QASerializer(),
+        allow_empty=True,
+        required=False
+    )
     created_at = serializers.DateTimeField(read_only=True)
     updated_at = serializers.DateTimeField(read_only=True)
 

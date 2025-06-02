@@ -131,6 +131,16 @@ class QAView(APIView):
 
         return Response({"error": "QA not found in this chat session"}, status=status.HTTP_404_NOT_FOUND)
     
+class ChatSessionIdAPIView(APIView):
+    def get(self, request, chat_session_id):
+        try:
+            chat_session = ChatSession.objects.get(id=UUID(chat_session_id))
+            serializer = ChatSessionSerializer(chat_session)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except ChatSession.DoesNotExist:
+            return Response({"error": "Chat session not found"}, status=status.HTTP_404_NOT_FOUND)
+
+# Function to send a message to a user via WebSocket
 def send_message_to_user(user_id, message):
     channel_layer = get_channel_layer()
     async_to_sync(channel_layer.group_send)(
