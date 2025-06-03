@@ -27,18 +27,19 @@ export default function SignupPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      console.log({ email, name, password });
       const signupData = await handleSignup(email, name, password);
       console.log('Signup data:', signupData);
       if (signupData.id) {
         setSignupSuccess(true);
-        setToastMessage('Signup successful!');
+        setToastMessage('Signup successful and back to login!');
         setTimeout(() => {
-          router.push('/chatbot/general');
+          router.push('/login');
         }, 2000);
       }
     } catch (error: any) {
       setSignupError(true);
-      setToastMessage(error.message || 'Signup failed');
+      setToastMessage('Your password has at least 8 letters!');
     }
   };
 

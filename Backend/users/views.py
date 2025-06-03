@@ -50,6 +50,10 @@ class LoginAPIView(APIView):
         
         user = User.objects(email=email).first()
         if user:
+            if not user.password:
+                print("User uses Google to Login, so let's use Gmail to log in");
+                return Response({"error": "Use your email or Google Account to log in"}, status=status.HTTP_400_BAD_REQUEST)
+            
             serializer = UserSerializer(user)
             if not check_password(password, user.password):
                 print("Password is incorrect")
