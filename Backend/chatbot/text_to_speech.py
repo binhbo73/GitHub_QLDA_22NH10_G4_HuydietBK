@@ -21,7 +21,7 @@ def text_to_speech_zalo(text, output_file="output.wav"):
     }
 
     headers = {
-        "apikey": "pJ8qlkMaWXEzfqp0ZLwQAfxyxnreftkk",
+        "apikey": "qqt7P6dg9I3cH3uJJY5R0qoKKf16OAnb",
         "Content-Type": "application/x-www-form-urlencoded"  # Changed content type
     }
 
@@ -65,8 +65,8 @@ def text_to_speech_zalo(text, output_file="output.wav"):
 
 # Test function
 if __name__ == "__main__":
-    test_text = '''**Doraemon** - bộ phim hoạt hình Nhật Bản kinh điển, ra đời từ năm 1973, 
-'''
+    test_text = '''"Thám tử lừng danh Conan" là siêu phẩm trinh thám anime Nhật Bản đình đám, xoay quanh thám tử Shinichi Kudo - thiếu niên tài ba bị biến thành cậu bé Conan Edogawa sau khi dính phải độc dược của Tổ chức Áo đen. Ẩn mình dưới vỏ bọc học sinh tiểu học, Conan âm thầm phá án cùng Hội thám tử nhí, hỗ trợ "chú ruột" Kogoro Mori - người tưởng chừng vụng về nhưng luôn tỏa sáng nhờ trợ lý đặc biệt này. Phim kết hợp khéo léo yếu tố ly kỳ qua từng vụ án đầy trí tuệ, xen lẫn tình cảm ngọt ngào giữa Conan và Ran Mori, cùng những pha hành động nghẹt thở. Với hơn 1.000 tập phim truyền hình và 27 phim điện ảnh, "Conan" không ngừng chinh phục khán giả bằng cốt truyện đa tầng, twist bất ngờ và thông điệp nhân văn sâu sắc. Một hành trình giải mã tội ác không thể bỏ lỡ cho mọi tín đồ phim hình sự!
+                '''
     result = text_to_speech_zalo(test_text)
     if result:
         print(f"Audio generated successfully at: {result}")
