@@ -104,7 +104,8 @@ class QAView(APIView):
             "chat_session_id": str(chat_session.id),
             "question": qa.question,
             "answer": qa.answer,
-            "question_id": str(qa.id)
+            "question_id": str(qa.id),
+            "user_id": user_uuid
         }, status=status.HTTP_201_CREATED)
     
     def put(self, request):
@@ -139,6 +140,20 @@ class ChatSessionIdAPIView(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         except ChatSession.DoesNotExist:
             return Response({"error": "Chat session not found"}, status=status.HTTP_404_NOT_FOUND)
+
+class ChatSessionAPIView(APIView):
+    def get(self, request, user_id):
+        print(user_id)
+        try:
+            chat_sessions = ChatSession.objects.filter(user_id=user_id)
+            print(chat_sessions)
+            serializer = ChatSessionSerializer(chat_sessions, many=True)
+            print(serializer)
+            print("ready to return")
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except ChatSession.DoesNotExist:
+            print("error occured")
+            return Response({"error": "No chat session found for this user"}, status=status.HTTP_404_NOT_FOUND)
 
 # Function to send a message to a user via WebSocket
 def send_message_to_user(user_id, message):

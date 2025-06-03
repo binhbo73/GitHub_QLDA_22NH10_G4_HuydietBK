@@ -35,7 +35,3 @@ class ChatSessionSerializer(serializers.Serializer):
         instance.updated_at = datetime.utcnow()
         instance.save()
         return instance
-    
-    class Meta:
-        model = ChatSession
-        fields = "__all__"
