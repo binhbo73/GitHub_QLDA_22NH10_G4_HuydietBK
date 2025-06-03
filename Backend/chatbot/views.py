@@ -145,7 +145,7 @@ class ChatSessionAPIView(APIView):
     def get(self, request, user_id):
         print(user_id)
         try:
-            chat_sessions = ChatSession.objects.filter(user_id=user_id)
+            chat_sessions = ChatSession.objects.filter(user_id=UUID(user_id))
             print(chat_sessions)
             serializer = ChatSessionSerializer(chat_sessions, many=True)
             print(serializer)
