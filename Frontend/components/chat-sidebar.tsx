@@ -1,27 +1,31 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { PlusCircle, MessageSquare, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import type { ChatHistory } from '@/models/ChatHistory';
+import { getChatHistory } from '@/lib/qa';
 
 export function ChatSidebar({ onNewChat }: { onNewChat?: () => void }) {
-  const [chatHistory, setChatHistory] = useState<ChatHistory[]>(() => {
-    if (typeof window !== 'undefined') {
-      try {
-        const saved = localStorage.getItem('chatHistory');
-        return saved ? JSON.parse(saved) : [];
-      } catch (error) {
-        console.error('Error loading chat history:', error);
-        return [];
-      }
-    }
-    return [];
-  });
+  const [chatHistory, setChatHistory] = useState<ChatHistory[]>([]);
+  const [userId, setUserId] = useState<string | null>(null);
   const pathname = usePathname();
   const currentType = pathname.split('/')[2];
+
+  useEffect(() => {
+    // Load chat history from localStorage on component mount
+    const fetchHistory = async () => {
+      const storedHistory = await getChatHistory(userId || localStorage.getItem('userId') || '');
+      if (storedHistory) {
+        setChatHistory(storedHistory);
+      } else {
+        setChatHistory([]);
+      }
+    };
+    fetchHistory();
+  }, []);
 
   const createNewChat = () => {
     // Generate a new chat ID

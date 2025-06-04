@@ -92,6 +92,7 @@ class GoogleLoginAPIView(APIView):
                     user.updated_at = datetime.utcnow()
                     user.save()
                 serializer = UserSerializer(user)
+                print(f"User found or created: {serializer.data}")
                 return Response({'user': serializer.data}, status=status.HTTP_200_OK)
             except ValueError as e:
                 return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)

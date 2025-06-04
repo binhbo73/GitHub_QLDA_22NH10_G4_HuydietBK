@@ -20,6 +20,7 @@ class ChatSession(Document):
     qa_pairs = ListField(EmbeddedDocumentField(QA))  # Store as JSON string or similar
     created_at = DateTimeField(default=datetime.utcnow)
     updated_at = DateTimeField(default=datetime.utcnow)
+    title = StringField(required=False, default="Default Session Name")
 
     meta = {'collection': 'chat_sessions'}
 

@@ -5,7 +5,9 @@ import { MessageInput } from '@/components/message-input';
 import { ChatMessage } from '@/components/chat-message';
 import { MessageSquare, BarChart, FileText, Megaphone } from 'lucide-react';
 import type { Message } from '@/models/Message';
-import { handleQA } from '@/lib/qa';
+import { getQAFromChatSessionId, handleQA } from '@/lib/qa';
+import { get } from 'http';
+import { QAPair } from '@/models/QAPair';
 
 interface ChatbotContentProps {
   type: string;
@@ -39,14 +41,42 @@ const chatbotData = {
 };
 
 export function ChatbotContent({ type }: ChatbotContentProps) {
-  const [messages, setMessages] = useState<Message[]>(() => {
+  const [messages, setMessages] = useState<Message[]>([]);
+
+  useEffect(() => {
     if (typeof window !== 'undefined') {
       const chatId = new URLSearchParams(window.location.search).get('chat');
+      if (!chatId) {
+        setMessages([]);
+        return;
+      }
       const saved = localStorage.getItem(`chat_${chatId}`);
-      return saved ? JSON.parse(saved) : [];
+      if (saved) {
+        setMessages(JSON.parse(saved));
+        return;
+      }
+      getQAFromChatSessionId(chatId).then((qaPairs: QAPair[]) => {
+        const msgs = [] as Message[];
+        qaPairs.forEach((pair: QAPair) => {
+          msgs.push({
+            id: pair.id,
+            text: pair.question,
+            isBot: false,
+            timestamp: new Date(pair.created_at).toLocaleTimeString()
+          });
+          msgs.push({
+            id: pair.id + '_response',
+            text: pair.answer,
+            isBot: true,
+            timestamp: new Date(pair.created_at).toLocaleTimeString()
+          });
+        });
+        // Save to localStorage
+        localStorage.setItem(`chat_${chatId}`, JSON.stringify(msgs));
+        setMessages(msgs || []);
+      });
     }
-    return [];
-  });
+  }, []);
 
   // Ref for auto-scrolling
   const messagesEndRef = useRef<HTMLDivElement>(null);

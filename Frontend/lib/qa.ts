@@ -39,3 +39,24 @@ export async function handleSaveEditedMessage(
   console.log('Updated QA response: ', data);
   return data;
 }
+
+export async function getChatHistory(user_id: string) {
+  const response = await fetch(`${API_BASE_URL}chatbot/all-chat-session/${user_id}/`);
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data.error || 'Failed to fetch chat session ID');
+  }
+  console.log('Chat session ID: ', data);
+  localStorage.setItem('chatHistory', data);
+  return data;
+}
+
+export async function getQAFromChatSessionId(chat_session_id: string) {
+  const response = await fetch(`${API_BASE_URL}chatbot/qa-pairs/${chat_session_id}/`);
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data.error || 'Failed to fetch QA data');
+  }
+  console.log('QA data from chat session: ', data);
+  return data;
+}

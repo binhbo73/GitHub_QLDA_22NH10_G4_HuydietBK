@@ -5,10 +5,15 @@ import { usePathname } from 'next/navigation';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { handleLogout } from '@/lib/login';
+import { useEffect, useState } from 'react';
 
 export function Navbar() {
   const pathname = usePathname();
-  const userId = localStorage.getItem('userId') || null;
+  const [userId, setUserId] = useState<string | null>(null);
+  useEffect(() => {
+    const storedUserId = localStorage.getItem('userId');
+    setUserId(storedUserId);
+  }, []);
 
   const handleLogoutClick = () => {
     handleLogout();

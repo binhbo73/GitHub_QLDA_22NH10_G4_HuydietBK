@@ -35,3 +35,17 @@ class ChatSessionSerializer(serializers.Serializer):
         instance.updated_at = datetime.utcnow()
         instance.save()
         return instance
+    
+class ChatSessionELementSerializer(serializers.Serializer):
+    id = serializers.UUIDField()
+    title = serializers.CharField()
+    updated_at = serializers.DateTimeField(read_only=True)
+
+    def validate(self, data):
+        if not data.get('chat_session_id'):
+            raise serializers.ValidationError("chat_session_id is required")
+        if not data.get('qa_id'):
+            raise serializers.ValidationError("qa_id is required")
+        if not data.get('new_answer'):
+            raise serializers.ValidationError("new_answer is required")
+        return data

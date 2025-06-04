@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 import os
 import httpx
 import json
-from .serializers import QASerializer, ChatSessionSerializer
+from .serializers import QASerializer, ChatSessionSerializer, ChatSessionELementSerializer
 from .models import ChatSession, QA
 from users.models import User
 from datetime import datetime
@@ -89,12 +89,15 @@ class QAView(APIView):
                 return Response({"error": "Chat session not found"}, status=status.HTTP_404_NOT_FOUND)
         else:
             print("You don't have a chat session id, creating a new one to use")
+            title =  " ".join(qa.question[:5])
             chat_session = ChatSession(
                 user_id=user_uuid,
                 qa_pairs=[qa],
                 created_at=datetime.utcnow(),
-                updated_at=datetime.utcnow()
+                updated_at=datetime.utcnow(),
+                title=title
             )
+            print(chat_session)
             chat_session.save()
 
         # TODO: call event to generate answer for this question
@@ -141,16 +144,30 @@ class ChatSessionIdAPIView(APIView):
         except ChatSession.DoesNotExist:
             return Response({"error": "Chat session not found"}, status=status.HTTP_404_NOT_FOUND)
 
+class QAPairsAPIView(APIView):
+    def get(self, request, chat_session_id):
+        try:
+            chat_session = ChatSession.objects.get(id=UUID(chat_session_id))
+            serializer = QASerializer(chat_session.qa_pairs, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except ChatSession.DoesNotExist:
+            return Response({"error": "Chat session not found"}, status=status.HTTP_404_NOT_FOUND)
+
 class ChatSessionAPIView(APIView):
     def get(self, request, user_id):
         print(user_id)
         try:
             chat_sessions = ChatSession.objects.filter(user_id=UUID(user_id))
             print(chat_sessions)
-            serializer = ChatSessionSerializer(chat_sessions, many=True)
-            print(serializer)
+            serializer = ChatSessionELementSerializer(chat_sessions, many=True)
+            print(serializer.data)
             print("ready to return")
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            return Response([{
+                "id": str(session.get("id")),
+                "title": session.get("title"),
+                "type": "general",
+                "timestamp": session.get("updated_at")
+            } for session in serializer.data], status=status.HTTP_200_OK)
         except ChatSession.DoesNotExist:
             print("error occured")
             return Response({"error": "No chat session found for this user"}, status=status.HTTP_404_NOT_FOUND)
