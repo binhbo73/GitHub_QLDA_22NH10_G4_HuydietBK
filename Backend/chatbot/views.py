@@ -158,10 +158,8 @@ class ChatSessionAPIView(APIView):
         print(user_id)
         try:
             chat_sessions = ChatSession.objects.filter(user_id=UUID(user_id))
-            print(chat_sessions)
             serializer = ChatSessionELementSerializer(chat_sessions, many=True)
             print(serializer.data)
-            print("ready to return")
             return Response([{
                 "id": str(session.get("id")),
                 "title": session.get("title"),

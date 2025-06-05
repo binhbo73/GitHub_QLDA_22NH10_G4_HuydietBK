@@ -8,6 +8,7 @@ import type { Message } from '@/models/Message';
 import { getQAFromChatSessionId, handleQA } from '@/lib/qa';
 import { get } from 'http';
 import { QAPair } from '@/models/QAPair';
+import { useSearchParams } from 'next/navigation';
 
 interface ChatbotContentProps {
   type: string;
@@ -42,14 +43,16 @@ const chatbotData = {
 
 export function ChatbotContent({ type }: ChatbotContentProps) {
   const [messages, setMessages] = useState<Message[]>([]);
+  const chatId = useSearchParams().get('chat')
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const chatId = new URLSearchParams(window.location.search).get('chat');
       if (!chatId) {
         setMessages([]);
+        localStorage.removeItem('chatSessionId');
         return;
       }
+      localStorage.setItem('chatSessionId', chatId);
       const saved = localStorage.getItem(`chat_${chatId}`);
       if (saved) {
         setMessages(JSON.parse(saved));
@@ -76,7 +79,7 @@ export function ChatbotContent({ type }: ChatbotContentProps) {
         setMessages(msgs || []);
       });
     }
-  }, []);
+  }, [chatId]);
 
   // Ref for auto-scrolling
   const messagesEndRef = useRef<HTMLDivElement>(null);
