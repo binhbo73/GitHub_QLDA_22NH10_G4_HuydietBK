@@ -21,7 +21,7 @@ def text_to_speech_zalo(text, output_file="output.wav"):
     }
 
     headers = {
-        "apikey": "qqt7P6dg9I3cH3uJJY5R0qoKKf16OAnb",
+        "apikey": "ZQuA2RYMn4QTgmGikOEimV6iQF7tXtL2",
         "Content-Type": "application/x-www-form-urlencoded"  # Changed content type
     }
 
@@ -41,13 +41,14 @@ def text_to_speech_zalo(text, output_file="output.wav"):
                 if isinstance(json_response, dict) and json_response.get("error_code") == 0:
                     audio_url = json_response.get("data", {}).get("url")
                     if audio_url:
-                        print(f"Downloading audio from: {audio_url}")
-                        audio_response = requests.get(audio_url)
-                        if audio_response.status_code == 200:
-                            with open(output_path, "wb") as f:
-                                f.write(audio_response.content)
-                            print(f"Successfully generated audio file at: {output_path}")
-                            return output_path
+                        return audio_url  # Return the audio URL directly
+                        # print(f"Downloading audio from: {audio_url}")
+                        # audio_response = requests.get(audio_url)
+                        # if audio_response.status_code == 200:
+                        #     with open(output_path, "wb") as f:
+                        #         f.write(audio_response.content)
+                        #     print(f"Successfully generated audio file at: {output_path}")
+                        #     return output_path
                 else:
                     raise Exception(f"Zalo API Error: {json_response.get('error_message', 'Unknown error')}")
             except json.JSONDecodeError:
@@ -65,8 +66,24 @@ def text_to_speech_zalo(text, output_file="output.wav"):
 
 # Test function
 if __name__ == "__main__":
-    test_text = '''"Thám tử lừng danh Conan" là siêu phẩm trinh thám anime Nhật Bản đình đám, xoay quanh thám tử Shinichi Kudo - thiếu niên tài ba bị biến thành cậu bé Conan Edogawa sau khi dính phải độc dược của Tổ chức Áo đen. Ẩn mình dưới vỏ bọc học sinh tiểu học, Conan âm thầm phá án cùng Hội thám tử nhí, hỗ trợ "chú ruột" Kogoro Mori - người tưởng chừng vụng về nhưng luôn tỏa sáng nhờ trợ lý đặc biệt này. Phim kết hợp khéo léo yếu tố ly kỳ qua từng vụ án đầy trí tuệ, xen lẫn tình cảm ngọt ngào giữa Conan và Ran Mori, cùng những pha hành động nghẹt thở. Với hơn 1.000 tập phim truyền hình và 27 phim điện ảnh, "Conan" không ngừng chinh phục khán giả bằng cốt truyện đa tầng, twist bất ngờ và thông điệp nhân văn sâu sắc. Một hành trình giải mã tội ác không thể bỏ lỡ cho mọi tín đồ phim hình sự!
-                '''
+    test_text = '''
+    "Con gái hay con trai, điều quan trọng nhất là được yêu thương và tôn trọng! 💞  
+Trong một gia đình hạnh phúc, mỗi đứa trẻ đều xứng đáng có cơ hội phát triển toàn diện, dù là con trai hay con gái.  
+🌻 Hãy nuôi dưỡng tài năng, tính cách và ước mơ của các con, thay vì gò bó bởi định kiến giới.  
+💪 Khuyến khích con trai biết dịu dàng, con gái mạnh mẽ, vì thế giới này cần cả sự cân bằng và đa màu sắc.  
+
+Nhớ nhé:  
+- Con gái không "yếu đuối" chỉ vì là phái nữ.  
+- Con trai không cần "che giấu" cảm xúc để tỏ ra cứng rắn.  
+
+Gia đình là nơi ươm mầm hạnh phúc, hãy để tình yêu thương vượt lên mọi khuôn mẫu. 🏠✨  
+
+#BìnhĐẳngGiới #GiaĐìnhHạnhPhúc #NuôiDạyConTíchCực"  
+
+---
+
+Thông điệp này vừa tôn vinh sự đa dạng, vừa gửi gắm tinh thần tiến bộ, phù hợp với cộng đồng Facebook. Bạn có thể tuỳ chỉnh theo phong cách cá nhân nhé! 😊
+'''
     result = text_to_speech_zalo(test_text)
     if result:
         print(f"Audio generated successfully at: {result}")

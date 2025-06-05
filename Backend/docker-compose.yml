@@ -1,0 +1,15 @@
+version: "3.9"
+services:
+  web:
+    build: .
+    volumes:
+      - .:/app         # volume code
+      - venv:/usr/local/lib/python3.11/site-packages  # volume thư viện
+    ports:
+      - "8000:8000"
+    environment:
+      - DJANGO_SETTINGS_MODULE=chatbot_ai_server.settings
+      - PYTHONUNBUFFERED=1
+
+volumes:
+  venv:

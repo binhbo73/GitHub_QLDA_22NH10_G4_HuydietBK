@@ -1,8 +1,8 @@
 import uuid
-from mongoengine import Document, StringField, EmailField, DateTimeField, UUIDField
+from mongoengine import Document, StringField, DateTimeField, UUIDField, EmbeddedDocument, EmbeddedDocumentField, ListField
 from datetime import datetime
 
-class QA(Document):
+class QA(EmbeddedDocument):
     id = UUIDField(default=uuid.uuid4, primary_key=True)
     question = StringField(required=True)
     answer = StringField(required=True)
@@ -17,9 +17,10 @@ class QA(Document):
 class ChatSession(Document):
     id = UUIDField(default=uuid.uuid4, primary_key=True)
     user_id = UUIDField(required=True)
-    qa_pairs = StringField(required=True)  # Store as JSON string or similar
+    qa_pairs = ListField(EmbeddedDocumentField(QA))  # Store as JSON string or similar
     created_at = DateTimeField(default=datetime.utcnow)
     updated_at = DateTimeField(default=datetime.utcnow)
+    title = StringField(required=False, default="Default Session Name")
 
     meta = {'collection': 'chat_sessions'}
 
