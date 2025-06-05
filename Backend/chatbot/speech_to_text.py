@@ -10,10 +10,10 @@ def transfer_audio_to_text():
 
   import os
 
-  media_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "media")
+  media_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "Backend")
   os.makedirs(media_dir, exist_ok=True)
 
-  filename = os.path.join(media_dir, "output.wav")
+  filename = os.path.join(media_dir, "audio.wav")
   processed_filename = os.path.join(media_dir, "processed_audio.wav")
 
   # Tiền xử lý âm thanh

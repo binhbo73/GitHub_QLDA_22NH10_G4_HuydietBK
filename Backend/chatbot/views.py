@@ -203,13 +203,14 @@ class SpeechToTextAPIView(APIView):
         if not audio_file:
             return Response({"error": "Audio file is required"}, status=status.HTTP_400_BAD_REQUEST)
 
-        if default_storage.exists(audio_file.name):
-          default_storage.delete(audio_file.name)
+        if default_storage.exists("audio.wav"):
+          default_storage.delete("audio.wav")
 
         # Lưu tệp âm thanh
-        saved_path = default_storage.save(audio_file.name, audio_file)
+        # saved_path = default_storage.save("audio.wav", audio_file)
 
         message = transfer_audio_to_text()
+        
         if not message:
             return Response({"error": "Failed to convert audio to text"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
