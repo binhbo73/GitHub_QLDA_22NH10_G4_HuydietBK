@@ -2,6 +2,14 @@ import requests
 import os
 import json
 
+api_keys = [
+    "pJ8qlkMaWXEzfqp0ZLwQAfxyxnreftkk",
+    "qqt7P6dg9I3cH3uJJY5R0qoKKf16OAnb",
+    "B7k5ug9C9ELEMNO2jNGIFgesCV28Dgbr"
+    "ZQuA2RYMn4QTgmGikOEimV6iQF7tXtL2",
+]
+current = 0
+
 def text_to_speech_zalo(text, output_file="output.wav"):
     url = "https://api.zalo.ai/v1/tts/synthesize"
 
@@ -21,14 +29,14 @@ def text_to_speech_zalo(text, output_file="output.wav"):
     }
 
     headers = {
-        "apikey": "ZQuA2RYMn4QTgmGikOEimV6iQF7tXtL2",
+        "apikey": api_keys[0],
         "Content-Type": "application/x-www-form-urlencoded"  # Changed content type
     }
 
     try:
         # Use data parameter instead of json
         response = requests.post(url, data=payload, headers=headers)
-        
+
         # Debug info
         print(f"Request payload: {payload}")
         print(f"Response status: {response.status_code}")
@@ -67,18 +75,18 @@ def text_to_speech_zalo(text, output_file="output.wav"):
 # Test function
 if __name__ == "__main__":
     test_text = '''
-    "Con gái hay con trai, điều quan trọng nhất là được yêu thương và tôn trọng! 💞  
-Trong một gia đình hạnh phúc, mỗi đứa trẻ đều xứng đáng có cơ hội phát triển toàn diện, dù là con trai hay con gái.  
-🌻 Hãy nuôi dưỡng tài năng, tính cách và ước mơ của các con, thay vì gò bó bởi định kiến giới.  
-💪 Khuyến khích con trai biết dịu dàng, con gái mạnh mẽ, vì thế giới này cần cả sự cân bằng và đa màu sắc.  
+    "Con gái hay con trai, điều quan trọng nhất là được yêu thương và tôn trọng! 💞
+Trong một gia đình hạnh phúc, mỗi đứa trẻ đều xứng đáng có cơ hội phát triển toàn diện, dù là con trai hay con gái.
+🌻 Hãy nuôi dưỡng tài năng, tính cách và ước mơ của các con, thay vì gò bó bởi định kiến giới.
+💪 Khuyến khích con trai biết dịu dàng, con gái mạnh mẽ, vì thế giới này cần cả sự cân bằng và đa màu sắc.
 
-Nhớ nhé:  
-- Con gái không "yếu đuối" chỉ vì là phái nữ.  
-- Con trai không cần "che giấu" cảm xúc để tỏ ra cứng rắn.  
+Nhớ nhé:
+- Con gái không "yếu đuối" chỉ vì là phái nữ.
+- Con trai không cần "che giấu" cảm xúc để tỏ ra cứng rắn.
 
-Gia đình là nơi ươm mầm hạnh phúc, hãy để tình yêu thương vượt lên mọi khuôn mẫu. 🏠✨  
+Gia đình là nơi ươm mầm hạnh phúc, hãy để tình yêu thương vượt lên mọi khuôn mẫu. 🏠✨
 
-#BìnhĐẳngGiới #GiaĐìnhHạnhPhúc #NuôiDạyConTíchCực"  
+#BìnhĐẳngGiới #GiaĐìnhHạnhPhúc #NuôiDạyConTíchCực"
 
 ---
 

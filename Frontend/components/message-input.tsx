@@ -46,7 +46,7 @@ export function MessageInput({ onSendMessage, onSendAudioMessage }: MessageInput
       };
 
       recorder.onstop = () => {
-        const blob = new Blob(chunks, { type: 'audio/wav' });
+        const blob = new Blob(chunks, { type: 'audio/webm' });
         if (onSendAudioMessage) {
           onSendAudioMessage(blob);
         }

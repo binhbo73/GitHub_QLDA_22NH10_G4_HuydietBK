@@ -27,33 +27,33 @@ headers = {
     'Content-Type': 'application/json'
 }
 
-class QAView(APIView):
-    # This function helps to generate the answer for the questions requested by the user.
-    def generate_content_answer(self, model, question, user_id):
-        full_answer = ""
-        data = {
-            "model": model,
-            "messages": [
-                {"role": "system", "content": "You are a professional assistant, your content will be posted on Facebook."},
-                {"role": "user", "content": question}
-            ],
-            "stream": True
-        }
+def generate_content_answer(model, question):
+    full_answer = ""
+    data = {
+        "model": model,
+        "messages": [
+            {"role": "system", "content": "You are a professional assistant, your content will be posted on Facebook."},
+            {"role": "user", "content": question}
+        ],
+        "stream": True
+    }
 
-        with httpx.stream("POST", os.getenv('OPENROUTER_API_URL'), headers=headers, json=data, timeout=60.0) as response:
-            for line in response.iter_lines():
-                if line.startswith("data: "):
-                    raw = line.removeprefix("data: ").strip()
-                    if raw == "[DONE]":
-                        break
-                    try:
-                        content = json.loads(raw)["choices"][0]["delta"].get("content", "")
-                        full_answer += content
-                        # send_message_to_user(user_id, content)
-                    except Exception as e:
-                        print("Error processing response: " + str(e))
-                        pass
-        return full_answer
+    with httpx.stream("POST", os.getenv('OPENROUTER_API_URL'), headers=headers, json=data, timeout=60.0) as response:
+        for line in response.iter_lines():
+            if line.startswith("data: "):
+                raw = line.removeprefix("data: ").strip()
+                if raw == "[DONE]":
+                    break
+                try:
+                    content = json.loads(raw)["choices"][0]["delta"].get("content", "")
+                    full_answer += content
+                    # send_message_to_user(user_id, content)
+                except Exception as e:
+                    print("Error processing response: " + str(e))
+                    pass
+    return full_answer
+
+class QAView(APIView):
 
     def post(self, request):
         user_id = request.data.get('user_id')
@@ -70,10 +70,9 @@ class QAView(APIView):
             return Response(qa_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         qa_data = qa_serializer.validated_data
-        answer = self.generate_content_answer(
+        answer = generate_content_answer(
             model=os.getenv('MODEL'),
-            question=qa_data['question'],
-            user_id=user_uuid
+            question=qa_data['question']
         )
 
         qa = QA(
@@ -203,18 +202,59 @@ class SpeechToTextAPIView(APIView):
         if not audio_file:
             return Response({"error": "Audio file is required"}, status=status.HTTP_400_BAD_REQUEST)
 
-        if default_storage.exists("audio.wav"):
-          default_storage.delete("audio.wav")
+        print(audio_file.name)
+
+        if default_storage.exists("audio.webm"):
+          default_storage.delete("audio.webm")
 
         # Lưu tệp âm thanh
-        # saved_path = default_storage.save("audio.wav", audio_file)
+        saved_path = default_storage.save("audio.webm", audio_file)
 
         message = transfer_audio_to_text()
-        
+
         if not message:
             return Response({"error": "Failed to convert audio to text"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-        return Response({"text": message}, status=status.HTTP_200_OK)
+        answer = generate_content_answer(
+            model=os.getenv('MODEL'),
+            question=message
+        )
+
+        # Lưu câu hỏi và câu trả lời vào cơ sở dữ liệu
+        qa = QA(
+            question=message,
+            answer=answer,
+            created_at=datetime.utcnow(),
+            updated_at=datetime.utcnow()
+        )
+
+        chat_session_id = request.data.get('chat_session_id')
+        if chat_session_id:
+            try:
+                chat_session = ChatSession.objects.get(id=UUID(chat_session_id))
+                chat_session.qa_pairs.append(qa)
+                chat_session.save()
+            except ChatSession.DoesNotExist:
+                return Response({"error": "Chat session not found"}, status=status.HTTP_404_NOT_FOUND)
+        else:
+            title =  " ".join(qa.question.split()[:5])
+            chat_session = ChatSession(
+                user_id=user_uuid,
+                qa_pairs=[qa],
+                created_at=datetime.utcnow(),
+                updated_at=datetime.utcnow(),
+                title=title
+            )
+            chat_session.save()
+
+        return Response({
+            "message": "Question added to chat session",
+            "chat_session_id": str(chat_session.id),
+            "question": qa.question,
+            "answer": qa.answer,
+            "question_id": str(qa.id),
+            "user_id": user_uuid
+        }, status=status.HTTP_201_CREATED)
 
 
 # Function to send a message to a user via WebSocket
