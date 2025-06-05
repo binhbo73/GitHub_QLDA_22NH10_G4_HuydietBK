@@ -12,6 +12,8 @@ from users.models import User
 from datetime import datetime
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
+import re
+from chatbot.text_to_speech import text_to_speech_zalo
 
 from uuid import UUID
 
@@ -71,6 +73,7 @@ class QAView(APIView):
             question=qa_data['question'],
             user_id=user_uuid
         )
+
         qa = QA(
             question=qa_data['question'],
             answer=answer,
@@ -81,15 +84,13 @@ class QAView(APIView):
         chat_session_id = request.data.get('chat_session_id')
         if chat_session_id:
             try:
-                print("Already have the chat session ID and use it append")
                 chat_session = ChatSession.objects.get(id=UUID(chat_session_id))
                 chat_session.qa_pairs.append(qa)
                 chat_session.save()
             except ChatSession.DoesNotExist:
                 return Response({"error": "Chat session not found"}, status=status.HTTP_404_NOT_FOUND)
         else:
-            print("You don't have a chat session id, creating a new one to use")
-            title =  " ".join(qa.question[:5])
+            title =  " ".join(qa.question.split()[:5])
             chat_session = ChatSession(
                 user_id=user_uuid,
                 qa_pairs=[qa],
@@ -97,7 +98,6 @@ class QAView(APIView):
                 updated_at=datetime.utcnow(),
                 title=title
             )
-            print(chat_session)
             chat_session.save()
 
         # TODO: call event to generate answer for this question
@@ -169,6 +169,32 @@ class ChatSessionAPIView(APIView):
         except ChatSession.DoesNotExist:
             print("error occured")
             return Response({"error": "No chat session found for this user"}, status=status.HTTP_404_NOT_FOUND)
+        
+class TextToSpeechAPIView(APIView):
+    def clean_text(self, text):
+        return re.sub(r'(\*{1,3}|~{2})(.+?)\1', r'\2', text)
+
+    def post(self, request):
+        text = request.data.get('text')
+        if not text:
+            return Response({"error": "Text is required"}, status=status.HTTP_400_BAD_REQUEST)
+        text = self.clean_text(text)
+        # url = text_to_speech_zalo(text)
+        url = "https://chunk-v3.tts.zalo.ai/secure/d2d881985de5b4bbedf4/d2d881985de5b4bbedf4.wav?expires=1749721001&md5=AQonJc4I9rdXux88AZg3zw"
+        if not url:
+            return Response({"error": "Failed to generate audio"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return Response({"audio_url": url}, status=status.HTTP_200_OK)
+    
+class SpeechToTextAPIView(APIView):
+    def post(self, request):
+        audio_file = request.FILES.get('audio')
+        if not audio_file:
+            return Response({"error": "Audio file is required"}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Here you would implement the logic to convert speech to text
+        # For now, we will just return a placeholder response
+        return Response({"text": "This is a placeholder for the converted text"}, status=status.HTTP_200_OK)
+
 
 # Function to send a message to a user via WebSocket
 def send_message_to_user(user_id, message):

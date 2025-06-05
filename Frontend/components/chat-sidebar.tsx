@@ -29,8 +29,6 @@ export function ChatSidebar({ onNewChat }: { onNewChat?: () => void }) {
 
   const createNewChat = () => {
     // Generate a new chat ID
-    const chatSessionID = localStorage.getItem('chatSessionId');
-    alert(chatSessionID);
     const haveFirstMessageInThisChatSession = localStorage.getItem(
       'haveFirstMessageInThisChatSession'
     );
@@ -54,7 +52,7 @@ export function ChatSidebar({ onNewChat }: { onNewChat?: () => void }) {
       }
 
       // Navigate to a new chat URL
-      window.location.href = `/chatbot/${currentType}?chat=${newChatId}`;
+      window.location.href = `/chatbot/${currentType}`;
       localStorage.removeItem('chatSessionId');
     }
   };

@@ -2,10 +2,12 @@
 
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Pencil, Check, Share2 } from 'lucide-react';
+import { Pencil, Check, Share2, Volume2, Pause } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import React from 'react';
 import { handleSaveEditedMessage } from '@/lib/qa';
+import { text } from 'stream/consumers';
+import { textToSpeech } from '@/lib/audio';
 
 interface ChatMessageProps {
   message: string;
@@ -22,6 +24,8 @@ export function ChatMessage({
 }: ChatMessageProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [editedMessage, setEditedMessage] = useState(message);
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const [audioObj, setAudioObj] = useState<HTMLAudioElement | null>(null);
 
   const handleSave = () => {
     if (onEdit) {
@@ -30,6 +34,33 @@ export function ChatMessage({
 
     setIsEditing(false);
   };
+
+  const handleSpeak = async () => {
+    if (isSpeaking && audioObj) {
+      audioObj.pause();
+      audioObj.currentTime = 0;
+      setIsSpeaking(false);
+      return;
+    }
+
+    try {
+      const result = await textToSpeech(editedMessage);
+      const url = result.audio_url;
+      if (!url) {
+        console.error('No audio URL returned from textToSpeech');
+        return;
+      }
+      const audio = new Audio(url);
+
+      audio.play();
+      setAudioObj(audio);
+      setIsSpeaking(true);
+
+      audio.onended = () => setIsSpeaking(false);
+    } catch (error) {
+      console.error('Error in textToSpeech:', error);
+    }
+  }
 
   return (
     <div
@@ -100,6 +131,18 @@ export function ChatMessage({
                 <Pencil className='h-4 w-4' />
               </Button>
             )}
+            <Button
+              size='icon'
+              variant='ghost'
+              className='h-8 w-8 bg-purple-600/20 hover:bg-purple-600/40'
+              onClick={handleSpeak}
+            >
+              {isSpeaking ? (
+                <Pause className='h-4 w-4' />
+              ) : (
+                <Volume2 className='h-4 w-4' />
+              )}
+            </Button>
           </div>
         )}
       </div>
