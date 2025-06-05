@@ -35,7 +35,7 @@ class ChatSessionSerializer(serializers.Serializer):
         instance.updated_at = datetime.utcnow()
         instance.save()
         return instance
-    
+
 class ChatSessionELementSerializer(serializers.Serializer):
     id = serializers.UUIDField()
     title = serializers.CharField()
@@ -49,3 +49,6 @@ class ChatSessionELementSerializer(serializers.Serializer):
         if not data.get('new_answer'):
             raise serializers.ValidationError("new_answer is required")
         return data
+
+class SpeechToTextSerializer(serializers.Serializer):
+    audio_file = serializers.FileField(required=True)

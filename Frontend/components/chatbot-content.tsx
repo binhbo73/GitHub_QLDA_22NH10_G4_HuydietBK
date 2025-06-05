@@ -9,6 +9,7 @@ import { getQAFromChatSessionId, handleQA } from '@/lib/qa';
 import { get } from 'http';
 import { QAPair } from '@/models/QAPair';
 import { useSearchParams } from 'next/navigation';
+import sendRequestWithAudio from '@/lib/audio';
 
 interface ChatbotContentProps {
   type: string;
@@ -130,12 +131,6 @@ export function ChatbotContent({ type }: ChatbotContentProps) {
     }
 
     setTimeout(async () => {
-      const botMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        text: `This is a sample response from the ${data.title}. In a real application, this would be connected to an AI API.`,
-        isBot: true,
-        timestamp: new Date().toLocaleTimeString()
-      };
       const botAnswer = await handleQA(message);
       const botResponse: Message = {
         id: (Date.now() + 2).toString(),
@@ -152,6 +147,56 @@ export function ChatbotContent({ type }: ChatbotContentProps) {
         return newMessages;
       });
     }, 1000);
+  };
+
+  const handleSendAudioMessage = async (audioBlob: Blob) => {
+    const chatId = new URLSearchParams(window.location.search).get('chat');
+    const data = await sendRequestWithAudio(audioBlob)
+    const userMessage: Message = {
+      id: Date.now().toString(),
+      text: data.question,
+      isBot: false,
+      timestamp: new Date().toLocaleTimeString()
+    };
+
+    const updatedMessages = [...messages, userMessage];
+    setMessages(updatedMessages);
+
+    if (chatId) {
+      localStorage.setItem(`chat_${chatId}`, JSON.stringify(updatedMessages));
+
+      if (messages.length === 0) {
+        const savedHistory = localStorage.getItem('chatHistory');
+        if (savedHistory) {
+          const history = JSON.parse(savedHistory);
+          const updatedHistory = history.map((chat: any) =>
+            chat.id === chatId
+              ? {
+                  ...chat,
+                  title:
+                    data.question.slice(0, 30) +
+                    (data.question.length > 30 ? '...' : '')
+                }
+              : chat
+          );
+          localStorage.setItem('chatHistory', JSON.stringify(updatedHistory));
+        }
+      }
+    }
+    const botAnswer = data.answer;
+    const botResponse: Message = {
+      id: (Date.now() + 2).toString(),
+      text: botAnswer,
+      isBot: true,
+      timestamp: new Date().toLocaleTimeString()
+    };
+    setMessages(prev => {
+      const newMessages = [...prev, botResponse];
+      if (chatId) {
+        localStorage.setItem(`chat_${chatId}`, JSON.stringify(newMessages));
+      }
+      return newMessages;
+    });
   };
 
   return (
@@ -201,7 +246,7 @@ export function ChatbotContent({ type }: ChatbotContentProps) {
 
       <div className='border-t border-purple-900/30 p-4'>
         <div className='max-w-4xl mx-auto'>
-          <MessageInput onSendMessage={handleSendMessage} />
+          <MessageInput onSendMessage={handleSendMessage} onSendAudioMessage={handleSendAudioMessage} />
         </div>
       </div>
     </div>

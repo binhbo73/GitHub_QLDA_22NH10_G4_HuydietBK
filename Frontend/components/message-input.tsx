@@ -12,9 +12,11 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
+import sendRequestWithAudio from '@/lib/audio';
 
 interface MessageInputProps {
   onSendMessage?: (message: string) => void;
+  onSendAudioMessage?: (audioBlob: Blob) => void;
 }
 
 const AI_MODELS = [
@@ -25,10 +27,45 @@ const AI_MODELS = [
   // { id: 'github-copilot', name: 'GitHub Copilot' }
 ];
 
-export function MessageInput({ onSendMessage }: MessageInputProps) {
+export function MessageInput({ onSendMessage, onSendAudioMessage }: MessageInputProps) {
   const [message, setMessage] = useState('');
   const [isRecording, setIsRecording] = useState(false);
   const [selectedModel, setSelectedModel] = useState(AI_MODELS[0]);
+  const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
+  const [audioChunks, setAudioChunks] = useState<Blob[]>([]);
+
+  const handleRecordClick = async () => {
+  if (!isRecording) {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const recorder = new MediaRecorder(stream);
+      const chunks: Blob[] = [];
+
+      recorder.ondataavailable = e => {
+        if (e.data.size > 0) chunks.push(e.data);
+      };
+
+      recorder.onstop = () => {
+        const blob = new Blob(chunks, { type: 'audio/wav' });
+        if (onSendAudioMessage) {
+          onSendAudioMessage(blob);
+        }
+      };
+
+      recorder.start();
+      setAudioChunks(chunks);
+      setMediaRecorder(recorder);
+      setIsRecording(true);
+    } catch (error) {
+      console.error('Không thể truy cập microphone:', error);
+    }
+  } else {
+    if (mediaRecorder) {
+      mediaRecorder.stop();
+    }
+    setIsRecording(false);
+  }
+};
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -54,7 +91,7 @@ export function MessageInput({ onSendMessage }: MessageInputProps) {
             <Button
               type='button'
               size='icon'
-              onClick={() => setIsRecording(!isRecording)}
+              onClick={handleRecordClick}
               className={`rounded-full h-10 w-10 ${
                 isRecording
                   ? 'bg-red-600 hover:bg-red-700'

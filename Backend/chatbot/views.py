@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 import os
 import httpx
 import json
-from .serializers import QASerializer, ChatSessionSerializer, ChatSessionELementSerializer
+from .serializers import QASerializer, ChatSessionSerializer, ChatSessionELementSerializer, SpeechToTextSerializer
 from .models import ChatSession, QA
 from users.models import User
 from datetime import datetime
@@ -14,6 +14,8 @@ from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 import re
 from chatbot.text_to_speech import text_to_speech_zalo
+from chatbot.speech_to_text import transfer_audio_to_text
+from django.core.files.storage import default_storage
 
 from uuid import UUID
 
@@ -62,7 +64,7 @@ class QAView(APIView):
 
         if not User.objects(id=user_uuid).first():
             return Response({"error": "User does not exist"}, status=status.HTTP_404_NOT_FOUND)
-        
+
         qa_serializer = QASerializer(data=request.data)
         if not qa_serializer.is_valid():
             return Response(qa_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -110,7 +112,7 @@ class QAView(APIView):
             "question_id": str(qa.id),
             "user_id": user_uuid
         }, status=status.HTTP_201_CREATED)
-    
+
     def put(self, request):
         chat_session_id = request.data.get('chat_session_id')
         qa_id = request.data.get('qa_id')
@@ -134,7 +136,7 @@ class QAView(APIView):
                 return Response({"message": "Answer updated successfully"}, status=status.HTTP_200_OK)
 
         return Response({"error": "QA not found in this chat session"}, status=status.HTTP_404_NOT_FOUND)
-    
+
 class ChatSessionIdAPIView(APIView):
     def get(self, request, chat_session_id):
         try:
@@ -169,7 +171,7 @@ class ChatSessionAPIView(APIView):
         except ChatSession.DoesNotExist:
             print("error occured")
             return Response({"error": "No chat session found for this user"}, status=status.HTTP_404_NOT_FOUND)
-        
+
 class TextToSpeechAPIView(APIView):
     def clean_text(self, text):
         return re.sub(r'(\*{1,3}|~{2})(.+?)\1', r'\2', text)
@@ -184,16 +186,34 @@ class TextToSpeechAPIView(APIView):
         if not url:
             return Response({"error": "Failed to generate audio"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         return Response({"audio_url": url}, status=status.HTTP_200_OK)
-    
+
 class SpeechToTextAPIView(APIView):
     def post(self, request):
-        audio_file = request.FILES.get('audio')
+        user_id = request.data.get('user_id')
+        try:
+            user_uuid = UUID(user_id)
+        except (TypeError, ValueError):
+            return Response({"error": "Invalid or missing user_id"}, status=status.HTTP_400_BAD_REQUEST)
+
+        serializer = SpeechToTextSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        audio_file = serializer.validated_data.get('audio_file', None)
+
         if not audio_file:
             return Response({"error": "Audio file is required"}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Here you would implement the logic to convert speech to text
-        # For now, we will just return a placeholder response
-        return Response({"text": "This is a placeholder for the converted text"}, status=status.HTTP_200_OK)
+        if default_storage.exists(audio_file.name):
+          default_storage.delete(audio_file.name)
+
+        # Lưu tệp âm thanh
+        saved_path = default_storage.save(audio_file.name, audio_file)
+
+        message = transfer_audio_to_text()
+        if not message:
+            return Response({"error": "Failed to convert audio to text"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        return Response({"text": message}, status=status.HTTP_200_OK)
 
 
 # Function to send a message to a user via WebSocket
